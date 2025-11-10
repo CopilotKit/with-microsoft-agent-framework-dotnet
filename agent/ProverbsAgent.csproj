@@ -8,15 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../../integrations/microsoft-agent-framework/server/dotnet/AGUI/src/AGUI.csproj" />
-    <ProjectReference Include="../../../integrations/microsoft-agent-framework/server/dotnet/Microsoft.Agents.AI.AGUI/src/Microsoft.Agents.AI.AGUI.csproj" />
-    <ProjectReference Include="../../../integrations/microsoft-agent-framework/server/dotnet/Microsoft.Agents.AI.Hosting.AGUI.AspNetCore/src/Microsoft.Agents.AI.Hosting.AGUI.AspNetCore.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="9.10.0-preview.1.25513.3" />
-    <PackageReference Include="OpenAI" Version="2.5.0" />
-    <PackageReference Include="Microsoft.Agents.AI.AzureAI" Version="1.0.0-preview.251009.1" />
+    <PackageReference Include="Microsoft.Agents.AI.Hosting.AGUI.AspNetCore" Version="1.0.0-preview.251110.1" />
+    <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="9.10.2-preview.1.25552.1" />
+    <PackageReference Include="OpenAI" Version="2.6.0" />
   </ItemGroup>
 
 </Project>
