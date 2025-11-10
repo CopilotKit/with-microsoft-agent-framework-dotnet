@@ -63,7 +63,7 @@ public class ProverbsAgentFactory
             });
     }
 
-    public ChatClientAgent CreateProverbsAgent()
+    public AIAgent CreateProverbsAgent()
     {
         var chatClient = _openAiClient.GetChatClient("gpt-4o-mini").AsIChatClient();
 
@@ -80,7 +80,7 @@ public class ProverbsAgentFactory
                 AIFunctionFactory.Create(GetWeather, options: new() { Name = "get_weather", SerializerOptions = _jsonSerializerOptions })
             ]);
 
-        return chatClientAgent;
+        return new SharedStateAgent(chatClientAgent, _jsonSerializerOptions);
     }
 
     // =================
@@ -95,19 +95,17 @@ public class ProverbsAgentFactory
     }
 
     [Description("Add new proverbs to the list.")]
-    private ProverbsStateSnapshot AddProverbs([Description("The proverbs to add")] List<string> proverbs)
+    private void AddProverbs([Description("The proverbs to add")] List<string> proverbs)
     {
         _logger.LogInformation("➕ Adding proverbs: {Proverbs}", string.Join(", ", proverbs));
         _state.Proverbs.AddRange(proverbs);
-        return new() { Proverbs = _state.Proverbs };
     }
 
     [Description("Replace the entire list of proverbs.")]
-    private ProverbsStateSnapshot SetProverbs([Description("The new list of proverbs")] List<string> proverbs)
+    private void SetProverbs([Description("The new list of proverbs")] List<string> proverbs)
     {
         _logger.LogInformation("📝 Setting proverbs: {Proverbs}", string.Join(", ", proverbs));
         _state.Proverbs = [.. proverbs];
-        return new() { Proverbs = _state.Proverbs };
     }
 
     [Description("Get the weather for a given location. Ensure location is fully spelled out.")]
