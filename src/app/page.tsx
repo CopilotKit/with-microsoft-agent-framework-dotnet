@@ -3,31 +3,42 @@
 import { ProverbsCard } from "@/components/proverbs";
 import { WeatherCard } from "@/components/weather";
 import { MoonCard } from "@/components/moon";
-import { AgentState } from "@/lib/types";
-import { useCoAgent, useCopilotAction } from "@copilotkit/react-core";
+import {
+  useCoAgent,
+  useFrontendTool,
+  useHumanInTheLoop,
+  useRenderToolCall,
+} from "@copilotkit/react-core";
 import { CopilotKitCSSProperties, CopilotSidebar } from "@copilotkit/react-ui";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { AgentState } from "@/lib/types";
 
 export default function CopilotKitPage() {
   const [themeColor, setThemeColor] = useState("#6366f1");
 
-  // 🪁 Frontend Actions: https://docs.copilotkit.ai/pydantic-ai/frontend-actions
-  useCopilotAction({
+  // 🪁 Frontend Actions: https://docs.copilotkit.ai/microsoft-agent-framework/frontend-actions
+  useFrontendTool({
     name: "setThemeColor",
+    description: "Set the theme color of the application",
     parameters: [
       {
         name: "themeColor",
+        type: "string",
         description: "The theme color to set. Make sure to pick nice colors.",
         required: true,
       },
     ],
-    handler({ themeColor }) {
+    handler: async ({ themeColor }) => {
       setThemeColor(themeColor);
     },
   });
 
   return (
-    <main style={{ "--copilot-kit-primary-color": themeColor } as CopilotKitCSSProperties}>
+    <main
+      style={
+        { "--copilot-kit-primary-color": themeColor } as CopilotKitCSSProperties
+      }
+    >
       <CopilotSidebar
         disableSystemMessage={true}
         clickOutsideToClose={false}
@@ -54,7 +65,8 @@ export default function CopilotKitPage() {
           },
           {
             title: "Update Agent State",
-            message: "Please remove 1 random proverb from the list if there are any.",
+            message:
+              "Please remove 1 random proverb from the list if there are any.",
           },
           {
             title: "Read Agent State",
@@ -70,23 +82,20 @@ export default function CopilotKitPage() {
 
 function YourMainContent({ themeColor }: { themeColor: string }) {
   // 🪁 Shared State: https://docs.copilotkit.ai/pydantic-ai/shared-state
-  const { state, setState } = useCoAgent({
+  const { state, setState } = useCoAgent<AgentState>({
     name: "my_agent",
     initialState: {
-      proverbs: ["CopilotKit may be new, but its the best thing since sliced bread."],
+      proverbs: [
+        "CopilotKit may be new, but its the best thing since sliced bread.",
+      ],
     },
   });
 
-  useEffect(() => {
-    console.log("Agent state updated:", state);
-  }, [state]);
-
   //🪁 Generative UI: https://docs.copilotkit.ai/pydantic-ai/generative-ui
-  useCopilotAction(
+  useRenderToolCall(
     {
       name: "get_weather",
       description: "Get the weather for a given location.",
-      available: "disabled",
       parameters: [{ name: "location", type: "string", required: true }],
       render: ({ args }) => {
         return <WeatherCard location={args.location} themeColor={themeColor} />;
@@ -95,13 +104,15 @@ function YourMainContent({ themeColor }: { themeColor: string }) {
     [themeColor],
   );
 
-  // 🪁 Human In the Loop: https://docs.copilotkit.ai/pydantic-ai/human-in-the-loop
-  useCopilotAction(
+  // 🪁 Human In the Loop: https://docs.copilotkit.ai/microsoft-agent-framework/human-in-the-loop/frontend-tool-based
+  useHumanInTheLoop(
     {
       name: "go_to_moon",
       description: "Go to the moon on request.",
-      renderAndWaitForResponse: ({ respond, status }) => {
-        return <MoonCard themeColor={themeColor} status={status} respond={respond} />;
+      render: ({ respond, status }) => {
+        return (
+          <MoonCard themeColor={themeColor} status={status} respond={respond} />
+        );
       },
     },
     [themeColor],
